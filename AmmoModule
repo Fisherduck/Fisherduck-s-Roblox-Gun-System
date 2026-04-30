@@ -1,0 +1,32 @@
+local Ammo = {}
+Ammo.__index = Ammo
+
+----------------------------------------
+
+function Ammo.new(maxAmmo)
+	local self = setmetatable({}, Ammo)
+	self.MaxAmmo = maxAmmo
+	self.CurrentAmmo = maxAmmo
+	return self
+end
+
+
+function Ammo:Reload()
+	self.CurrentAmmo = self.MaxAmmo
+end
+
+
+function Ammo:UseAmmo(amount)
+	if self.CurrentAmmo < amount then
+		print("no ammo")
+		return false
+	end
+		
+	self.CurrentAmmo -= amount
+	print("Ammo:".. self.CurrentAmmo)
+	return true
+end
+
+----------------------------------------
+
+return Ammo
