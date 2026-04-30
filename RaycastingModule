@@ -1,0 +1,53 @@
+local Raycasting = {}
+Raycasting.__index = Raycasting
+
+local RunService = game:GetService("RunService")
+
+local GunData = require(script.Parent:WaitForChild("GunDataModule"))
+
+----------------------------------------
+
+function Raycasting.new(caster, gunName)
+	local self = setmetatable({}, Raycasting)
+	self.Caster = caster
+	self.IgnoreList = {caster}
+	self.Stats = GunData[gunName]
+	return self
+end
+
+
+function Raycasting:Cast(origin, direction, onHit)
+	local distanceTraveled = 0
+	local lastPosition = origin
+	local speed = self.Stats.BulletSpeed
+
+	local connection
+	connection = RunService.Heartbeat:Connect(function(deltaTime)
+		if distanceTraveled >= self.Stats.Range then
+			connection:Disconnect()
+			return
+		end
+
+		local step = speed * deltaTime
+		local newPosition = lastPosition + direction * step
+
+		local params = RaycastParams.new()
+		params.FilterDescendantsInstances = self.IgnoreList
+		params.FilterType = Enum.RaycastFilterType.Exclude
+
+		local result = workspace:Raycast(lastPosition, (newPosition - lastPosition), params)
+
+		if result then
+			connection:Disconnect()
+			onHit(result)
+			return
+		end
+
+		distanceTraveled += step
+		lastPosition = newPosition
+	end)
+end
+
+----------------------------------------
+
+return Raycasting
