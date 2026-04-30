@@ -1,0 +1,32 @@
+local Damage = {}
+Damage.__index = Damage
+
+local GunData = require(script.Parent:WaitForChild("GunDataModule"))
+
+----------------------------------------
+
+function Damage.new(gunName)
+	local self = setmetatable({}, Damage)
+	self.Stats = GunData[gunName]
+	self.BaseDamage = self.Stats.Damage
+	return self
+end
+
+
+function Damage:Apply(hitPart)
+	local character = hitPart:FindFirstAncestorWhichIsA("Model")
+	if not character then return end
+
+	local humanoid = character:FindFirstChildOfClass("Humanoid")
+	if not humanoid then return end
+
+	if hitPart.Name == "Head" then
+		humanoid:TakeDamage(self.BaseDamage * 2)
+	else
+		humanoid:TakeDamage(self.BaseDamage)
+	end
+end
+
+----------------------------------------
+
+return Damage
