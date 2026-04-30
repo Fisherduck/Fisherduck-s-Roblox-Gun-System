@@ -1,0 +1,60 @@
+local Shooting = {}
+Shooting.__index = Shooting
+
+local GunData = require(script.Parent:WaitForChild("GunDataModule"))
+local RaycastingModule = require(script.Parent:WaitForChild("RaycastingModule"))
+local AmmoModule = require(script.Parent:WaitForChild("AmmoModule"))
+local DamageModule = require(script.Parent:WaitForChild("DamageModule"))
+
+----------------------------------------
+
+function Shooting.new(gunName, caster)
+	local self = setmetatable({}, Shooting)
+
+	self.Stats = GunData[gunName]
+	self.FireRate = self.Stats.FireRate
+	self.LastShotTime = 0
+	
+	self.Raycaster = RaycastingModule.new(caster, gunName)
+	self.Ammo = AmmoModule.new(self.Stats.MaxAmmo)
+	self.Damage = DamageModule.new(gunName)
+	
+	self.Status = "Idle"
+	
+	return self
+end
+   
+   
+function Shooting:Reload()
+	self.Status = "Reloading"
+	
+	self.Ammo:Reload()
+	
+	self.Status = "Idle"
+end
+
+
+function Shooting:Fire(origin, direction)
+	if self.Status ~= "Idle" then return end
+
+	local currentTime = tick()
+	if currentTime - self.LastShotTime >= (60 / self.FireRate) then
+		self.LastShotTime = currentTime
+
+		local success = self.Ammo:UseAmmo(1)
+
+		if not success then
+			print("no ammo")
+			return
+		end
+
+		self.Raycaster:Cast(origin, direction, function(result)
+			self.Damage:Apply(result.Instance)
+			print("worky")
+		end)
+	end
+end
+
+----------------------------------------
+
+return Shooting
