@@ -1,0 +1,47 @@
+local RS = game:GetService("ReplicatedStorage")
+local UIS = game:GetService("UserInputService")
+local Players = game:GetService("Players")
+
+local player = Players.LocalPlayer
+local mouse = player:GetMouse()
+
+local Character = player.Character or player.CharacterAdded:Wait()
+local Humanoid = Character:WaitForChild("Humanoid")
+local Animator = Humanoid:WaitForChild("Animator")
+
+local Gun = script.Parent
+
+local RaycastingEvent = RS:WaitForChild("RaycastingEvent")
+local ReloadEvent = RS:WaitForChild("ReloadEvent")
+local GunHoldAnim = RS:WaitForChild("GunHoldAnim")
+
+----------------------------------------
+
+local animationTrack
+
+
+Gun.Equipped:Connect(function()
+	animationTrack = Animator:LoadAnimation(GunHoldAnim)
+	animationTrack:Play()
+end)
+
+
+Gun.Unequipped:Connect(function()
+	if animationTrack then
+		animationTrack:Stop()
+	end
+end)
+
+----------------------------------------
+
+UIS.InputBegan:Connect(function(input, gp)
+	if gp then return end
+	if Gun.Parent ~= player.Character then return end
+
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		RaycastingEvent:FireServer(mouse.Hit.Position)
+
+	elseif input.KeyCode == Enum.KeyCode.R then
+		ReloadEvent:FireServer()
+	end
+end)
