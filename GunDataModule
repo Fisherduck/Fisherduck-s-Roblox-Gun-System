@@ -1,0 +1,19 @@
+local GunData = {
+	["Pistol"] = {
+		FireRate = 300,
+		MaxAmmo = 12,
+		Range = 900,
+		BulletSpeed = 400,
+		Damage = 10
+	}
+}
+
+----------------------------------------
+
+function GunData.GetStats(name)
+	return GunData[name] or GunData["Pistol"]
+end
+
+----------------------------------------
+
+return GunData
