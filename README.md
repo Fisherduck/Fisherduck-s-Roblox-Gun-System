@@ -1,1 +1,1 @@
-You will need to make your own remote events, animations and gun item but that is simple to do.
+-- You will need to make your own remote events, animations and gun item but that is simple to do.
